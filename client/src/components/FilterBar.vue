@@ -1,7 +1,7 @@
 <template>
-  <div class="filters-bar">
-    <div class="filters-container">
-      <div class="filters-grid">
+  <div :class="layout === 'vertical' ? 'filters-vertical' : 'filters-bar'">
+    <div :class="isVertical ? 'filters-stack' : 'filters-container'">
+      <div :class="isVertical ? 'filters-stack' : 'filters-grid'">
         <div class="filter-group">
           <label>{{ t('filters.timePeriod') }}</label>
           <select v-model="selectedPeriod" class="filter-select">
@@ -70,12 +70,19 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { useFilters } from '../composables/useFilters'
 import { useI18n } from '../composables/useI18n'
 
 export default {
   name: 'FilterBar',
-  setup() {
+  props: {
+    layout: {
+      type: String,
+      default: 'horizontal'
+    }
+  },
+  setup(props) {
     const {
       selectedPeriod,
       selectedLocation,
@@ -87,6 +94,8 @@ export default {
 
     const { t } = useI18n()
 
+    const isVertical = computed(() => props.layout === 'vertical')
+
     return {
       t,
       selectedPeriod,
@@ -94,7 +103,8 @@ export default {
       selectedCategory,
       selectedStatus,
       hasActiveFilters,
-      resetFilters
+      resetFilters,
+      isVertical
     }
   }
 }
@@ -190,5 +200,70 @@ export default {
 .reset-filters-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* Vertical layout (sidebar) */
+.filters-vertical {
+  padding: 0;
+}
+
+.filters-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.filters-stack .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.filters-stack .filter-group label {
+  font-size: 0.688rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filters-stack .filter-select {
+  width: 100%;
+  min-width: unset;
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.813rem;
+}
+
+.filters-stack .filter-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.filters-stack .reset-filters-btn {
+  width: 100%;
+  justify-content: center;
+  gap: 0.375rem;
+  background: #1e293b;
+  border-color: #334155;
+  color: #64748b;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.filters-stack .reset-filters-btn::after {
+  content: 'Reset';
+}
+
+.filters-stack .reset-filters-btn:hover:not(:disabled) {
+  background: #334155;
+  color: #e2e8f0;
 }
 </style>
